@@ -1,0 +1,30 @@
+{
+  "name": "ramonromancastro/wp-cli-snapshot",
+  "description": "Declarative state management for WordPress. Export, validate, and apply environment states.",
+  "type": "wp-cli-package",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Ramón Román Castro",
+      "email": "ramonromancastro@gmail.com"
+    }
+  ],
+  "minimum-stability": "dev",
+  "require": {
+    "php": ">=7.4",
+    "wp-cli/wp-cli": "^2.8"
+  },
+  "autoload": {
+    "psr-4": {
+      "WPCliSnapshot\\": "src/"
+    },
+    "files": [
+      "snapshot-command.php"
+    ]
+  },
+  "extra": {
+    "branch-alias": {
+      "dev-main": "1.x-dev"
+    }
+  }
+}
