@@ -96,6 +96,18 @@ wp snapshot apply --file=staging-state.json --dry-run
 
 Because validate supports stdout formatting and apply is fully idempotent, you can easily integrate this into GitHub Actions, GitLab CI, or any bash deployment script to ensure all your WordPress nodes share the exact same configuration state.
 
+## Development & Transparency
+
+### Human-in-the-loop
+This project leverages **AI for code generation**. I believe in the ethical use of AI to speed up Open Source development while maintaining manual oversight on security and architecture. 
+
+Every line of code generated has been reviewed, tested, and adapted to meet WP-CLI standards and ensure the reliability of your WordPress snapshots.
+
+## Credits
+
+* **Author:** Ramón Román Castro ([@ramonromancastro](https://github.com/ramonromancastro))
+* **Homepage:** [rrc2software.org](https://www.rrc2software.org)
+
 ## License
 
 This project is licensed under the MIT License.
