@@ -6,7 +6,8 @@
   "authors": [
     {
       "name": "Ramón Román Castro",
-      "email": "ramonromancastro@gmail.com"
+      "email": "ramonromancastro@gmail.com",
+      "homepage": "https://www.rrc2software.org"
     }
   ],
   "minimum-stability": "dev",
