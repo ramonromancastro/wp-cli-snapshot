@@ -19,6 +19,10 @@ class ValidateCommand extends WP_CLI_Command {
      * [--stale-days=<days>]
      * : Number of days without an update before a package is flagged as abandoned. Default: 730.
      *
+     * [--strict]
+     * : Return a non-zero exit code if ANY package is outdated or stale. 
+     * By default, only critical security issues (Insecure Core, Removed packages) return an error code.
+     *
      * [--format=<format>]
      * : Render output in a particular format.
      * ---
@@ -52,6 +56,7 @@ class ValidateCommand extends WP_CLI_Command {
         $file_path  = WP_CLI\Utils\get_flag_value( $assoc_args, 'file', 'snapshot.json' );
         $stale_days = (int) WP_CLI\Utils\get_flag_value( $assoc_args, 'stale-days', 730 );
         $format     = WP_CLI\Utils\get_flag_value( $assoc_args, 'format', 'table' );
+        $is_strict  = WP_CLI\Utils\get_flag_value( $assoc_args, 'strict', false );
 
         // 1. Extraer y limpiar los campos solicitados por el usuario
         $fields_raw = WP_CLI\Utils\get_flag_value( $assoc_args, 'fields', 'Name,Type,Snapshot,Latest,Status' );
@@ -68,20 +73,26 @@ class ValidateCommand extends WP_CLI_Command {
 
         // SILENCE IS GOLDEN: Only print conversational logs if the format is human-readable
         if ( $format === 'table' ) {
-            WP_CLI::log( "Auditing snapshot against WordPress.org APIs (Stale threshold: {$stale_days} days)...\n" );
+            $strict_msg = $is_strict ? ' [STRICT MODE]' : '';
+            WP_CLI::log( "Auditing snapshot against WordPress.org APIs (Stale threshold: {$stale_days} days){$strict_msg}...\n" );
         }
 
         $results = [];
+        $return_code = 0; // 0 = Success, 1 = Pipeline Failure
 
         // 1. Audit Core
         if ( isset( $snapshot['core'] ) ) {
-            $results[] = $this->check_core( $snapshot['core'] );
+            $core_data = $this->check_core( $snapshot['core'] );
+            $results[] = $core_data;
+            $return_code = $this->evaluate_exit_code( $core_data['status'], $return_code, $is_strict );
         }
 
         // 2. Audit Themes
         if ( isset( $snapshot['themes']['installed'] ) ) {
             foreach ( $snapshot['themes']['installed'] as $theme ) {
-                $results[] = $this->check_theme( $theme, $stale_days );
+                $theme_data = $this->check_theme( $theme, $stale_days );
+                $results[]  = $theme_data;
+                $return_code = $this->evaluate_exit_code( $theme_data['status'], $return_code, $is_strict );
             }
         }
 
@@ -98,12 +109,23 @@ class ValidateCommand extends WP_CLI_Command {
                     ];
                     continue;
                 }
-                $results[] = $this->check_plugin( $plugin, $stale_days );
+                $plugin_data = $this->check_plugin( $plugin, $stale_days );
+                $results[]   = $plugin_data;
+                $return_code = $this->evaluate_exit_code( $plugin_data['status'], $return_code, $is_strict );
             }
         }
 
-        // 2. Pasar el array dinámico de $fields al formateador
+        // Output the data FIRST (so the CI pipeline can save the JSON/CSV artifact)
         WP_CLI\Utils\format_items( $format, $results, $fields );
+
+        // Halt the execution with an error code if issues were found
+        if ( $return_code !== 0 ) {
+            // We use halt() instead of error() to prevent dumping a generic text error into STDOUT if the user requested JSON
+            if ( $format === 'table' ) {
+                WP_CLI::log( WP_CLI::colorize( "%RAudit failed. Critical security issues or strict policy violations detected.%n" ) );
+            }
+            WP_CLI::halt( 1 );
+        }
     }
 
     /**
@@ -260,5 +282,35 @@ class ValidateCommand extends WP_CLI_Command {
         }
 
         return $current_status;
+    }
+
+    /**
+     * Evaluates if the current status string should trigger a pipeline failure (Exit Code 1).
+     */
+    private function evaluate_exit_code( $status_text, $current_exit_code, $is_strict ) {
+        // If it's already failing, don't reset it
+        if ( $current_exit_code === 1 ) {
+            return 1;
+        }
+
+        // Critical failures (Always break the build)
+        if ( strpos( $status_text, 'insecure' ) !== false ) {
+            return 1;
+        }
+        if ( strpos( $status_text, 'removed/not in repo' ) !== false ) {
+            return 1;
+        }
+
+        // Strict mode failures (Break the build if outdated or stale)
+        if ( $is_strict ) {
+            if ( strpos( $status_text, 'outdated' ) !== false ) {
+                return 1;
+            }
+            if ( strpos( $status_text, 'staled' ) !== false ) {
+                return 1;
+            }
+        }
+
+        return 0;
     }
 }
