@@ -41,6 +41,8 @@ class ValidateCommand extends WP_CLI_Command {
      * default: name,type,snapshot_version,update_version,status
      * ---
      *
+     * @when before_wp_load
+     *
      * ## EXAMPLES
      *
      * # Validate and display as a table (default)
