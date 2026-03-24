@@ -63,6 +63,8 @@ class ApplyCommand extends WP_CLI_Command {
         if ( isset( $snapshot['themes'] ) )  $this->process_themes( $snapshot['themes'], $is_dry_run, $is_force );
         if ( isset( $snapshot['plugins'] ) ) $this->process_plugins( $snapshot['plugins'], $is_dry_run, $is_force );
 
+        $this->update_translations( $is_dry_run );
+
         WP_CLI::success( $is_dry_run ? "Dry run completed successfully." : "Snapshot applied successfully. Environment is synchronized." );
     }
 
@@ -221,6 +223,28 @@ class ApplyCommand extends WP_CLI_Command {
         }
     }
 
+    /**
+     * ==========================================
+     * TRANSLATION LOGIC
+     * ==========================================
+     */
+    private function update_translations( $is_dry_run ) {
+        WP_CLI::log( "Updating translations for Core, Plugins, and Themes..." );
+
+        if ( ! $is_dry_run ) {
+            // Update Core translations
+            $this->run_cli( ['language', 'core', 'update'] );
+            
+            // Update all Plugin translations
+            $this->run_cli( ['language', 'plugin', 'update', '--all'] );
+            
+            // Update all Theme translations
+            $this->run_cli( ['language', 'theme', 'update', '--all'] );
+        } else {
+            WP_CLI::log( "-> [Dry Run] Translation updates skipped." );
+        }
+    }
+    
     /**
      * ==========================================
      * HELPERS & DEFENSIVE MEASURES
