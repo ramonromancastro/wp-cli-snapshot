@@ -10,7 +10,6 @@
       "homepage": "https://www.rrc2software.org"
     }
   ],
-  "minimum-stability": "dev",
   "require": {
     "php": ">=7.4",
     "wp-cli/wp-cli": "^2.8"
@@ -22,10 +21,5 @@
     "files": [
       "snapshot-command.php"
     ]
-  },
-  "extra": {
-    "branch-alias": {
-      "dev-main": "1.x-dev"
-    }
   }
 }
