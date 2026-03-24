@@ -135,7 +135,7 @@ class ValidateCommand extends WP_CLI_Command {
      */
     private function check_core( $current_version ) {
         $update_version = 'unknown';
-        $status = 'unknwon';
+        $status = 'unknown';
         $update = 'unknown';
         
         $url= "https://api.wordpress.org/core/stable-check/1.0/";
@@ -309,6 +309,9 @@ class ValidateCommand extends WP_CLI_Command {
                 return 1;
             }
             if ( strpos( $status_text, 'staled' ) !== false ) {
+                return 1;
+            }
+            if ( strpos( $status_text, 'unknown' ) !== false ) {
                 return 1;
             }
         }
