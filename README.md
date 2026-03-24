@@ -14,10 +14,8 @@ Perfect for CI/CD pipelines, agency workflows, and local development environment
 Installing this package via WP-CLI is straightforward. Run the following command in your terminal:
 
 ```bash
-wp package install tu-usuario-github/wp-cli-snapshot
+wp package install ramonromancastro/wp-cli-snapshot
 ```
-
-> Note: Replace tu-usuario-github with your actual GitHub username or organization name.
 
 ## 🚀 Commands Overview
 
