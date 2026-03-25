@@ -38,7 +38,7 @@ class ValidateCommand extends WP_CLI_Command {
      * [--fields=<fields>]
      * : Limit the output to specific object fields. Comma-separated list.
      * ---
-     * default: name,type,snapshot_version,update_version,status
+     * default: name,type,update,version,update_version,status
      * ---
      *
      * @when before_wp_load
@@ -61,7 +61,7 @@ class ValidateCommand extends WP_CLI_Command {
         $is_strict  = WP_CLI\Utils\get_flag_value( $assoc_args, 'strict', false );
 
         // 1. Extraer y limpiar los campos solicitados por el usuario
-        $fields_raw = WP_CLI\Utils\get_flag_value( $assoc_args, 'fields', 'Name,Type,Snapshot,Latest,Status' );
+        $fields_raw = WP_CLI\Utils\get_flag_value( $assoc_args, 'fields', 'name,type,update,version,update_version,status' );
         $fields     = array_filter( array_map( 'trim', explode( ',', $fields_raw ) ) );
 
         if ( ! file_exists( $file_path ) ) {
@@ -158,7 +158,7 @@ class ValidateCommand extends WP_CLI_Command {
             'name'     => 'wordpress core',
             'type'     => 'core',
             'update'   => $update,
-            'snapshot_version' => $current_version,
+            'version' => $current_version,
             'update_version' => $update_version,
             'status'   => $status,
         ];
@@ -210,7 +210,7 @@ class ValidateCommand extends WP_CLI_Command {
         return [
             'name'     => $slug,
             'type'     => 'plugin',
-            'snapshot_version' => $current_version,
+            'version' => $current_version,
             'update_version'   => $update_version,
             'status'   => $status,
         ];
@@ -258,7 +258,7 @@ class ValidateCommand extends WP_CLI_Command {
         return [
             'name'     => $slug,
             'type'     => 'theme',
-            'snapshot_version' => $current_version,
+            'version' => $current_version,
             'update_version'   => $update_version,
             'status'   => $status,
         ];
@@ -277,7 +277,7 @@ class ValidateCommand extends WP_CLI_Command {
         $days_since_update = floor( ( time() - $updated_timestamp ) / 86400 );
 
         if ( $days_since_update > $stale_days ) {
-            return $current_status . ", staled (> {$days_since_update} days)";
+            return $current_status . ", staled)";
         }
 
         return $current_status;
