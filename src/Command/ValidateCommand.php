@@ -92,6 +92,9 @@ class ValidateCommand extends WP_CLI_Command {
         // 2. Audit Themes
         if ( isset( $snapshot['themes']['installed'] ) ) {
             foreach ( $snapshot['themes']['installed'] as $theme ) {
+                if ( $theme['type'] === 'custom' ) {
+                    continue;
+                }
                 $theme_data = $this->check_theme( $theme, $stale_days );
                 $results[]  = $theme_data;
                 $return_code = $this->evaluate_exit_code( $theme_data['status'], $return_code, $is_strict );
@@ -102,13 +105,6 @@ class ValidateCommand extends WP_CLI_Command {
         if ( isset( $snapshot['plugins'] ) ) {
             foreach ( $snapshot['plugins'] as $plugin ) {
                 if ( $plugin['type'] === 'custom' ) {
-                    $results[] = [
-                        'name'     => $plugin['slug'],
-                        'type'     => 'Plugin (Custom)',
-                        'snapshot_version' => $plugin['version'],
-                        'update_version'   => 'N/A',
-                        'status'   => 'custom',
-                    ];
                     continue;
                 }
                 $plugin_data = $this->check_plugin( $plugin, $stale_days );
@@ -153,6 +149,7 @@ class ValidateCommand extends WP_CLI_Command {
                     $update = 'available';
                 } else {
                     $update = 'none';
+                    $update_version = '';
                 }
             }
         }
