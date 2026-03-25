@@ -56,6 +56,7 @@ wp snapshot validate
 
 - --file=<file>: Path to the JSON file to read. (Default: snapshot.json)
 - --stale-days=<days>: Number of days without an update before a package is flagged as abandoned. (Default: 730 - 2 years).
+- --strict: Return a non-zero exit code if ANY package is outdated or stale. By default, only critical security issues (Insecure Core, Removed packages) return an error code.
 - --format=<format>: Output format (table, json, csv, yaml). Essential for CI/CD integrations. (Default: table).
 
 #### Example (CI/CD Pipeline Security Check):
