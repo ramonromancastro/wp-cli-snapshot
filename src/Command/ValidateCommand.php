@@ -120,7 +120,7 @@ class ValidateCommand extends WP_CLI_Command {
         if ( $return_code !== 0 ) {
             // We use halt() instead of error() to prevent dumping a generic text error into STDOUT if the user requested JSON
             if ( $format === 'table' ) {
-                WP_CLI::log( WP_CLI::colorize( "%RAudit failed. Critical security issues or strict policy violations detected.%n" ) );
+                WP_CLI::log( WP_CLI::colorize( "\n%RAudit failed:%n Critical security issues or strict policy violations detected." ) );
             }
             WP_CLI::halt( 1 );
         }
@@ -279,7 +279,7 @@ class ValidateCommand extends WP_CLI_Command {
         $days_since_update = floor( ( time() - $updated_timestamp ) / 86400 );
 
         if ( $days_since_update > $stale_days ) {
-            return $current_status . ", staled)";
+            return $current_status . ", staled";
         }
 
         return $current_status;
