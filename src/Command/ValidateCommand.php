@@ -210,6 +210,7 @@ class ValidateCommand extends WP_CLI_Command {
         return [
             'name'     => $slug,
             'type'     => 'plugin',
+            'update'   => $update,
             'version' => $current_version,
             'update_version'   => $update_version,
             'status'   => $status,
@@ -258,6 +259,7 @@ class ValidateCommand extends WP_CLI_Command {
         return [
             'name'     => $slug,
             'type'     => 'theme',
+            'update'   => $update,
             'version' => $current_version,
             'update_version'   => $update_version,
             'status'   => $status,
